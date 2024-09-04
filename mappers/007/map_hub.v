@@ -15,9 +15,10 @@ module map_hub
 	
 	
 	assign map_out = 
-	map_idx == 30  ? map_out_030 :
+	map_idx == 30  ? map_out_098 : //map_out_030 :
 	map_idx == 36  ? map_out_036 :
 	map_idx == 46  ? map_out_046 :
+	map_idx == 98  ? map_out_098 :
 	map_idx == 104 ? map_out_104 :
 	map_idx == 111 ? map_out_111 :
 	map_idx == 162 ? map_out_162 :
@@ -41,6 +42,9 @@ module map_hub
 
 	wire [`BW_MAP_OUT-1:0]map_out_030;
 	map_030 m030(map_out_030, bus, sys_cfg, ss_ctrl);
+	
+	wire [`BW_MAP_OUT-1:0]map_out_098;
+	map_098 m098(map_out_098, bus, sys_cfg, ss_ctrl);
 	
 	wire [`BW_MAP_OUT-1:0]map_out_036;
 	map_036 m036(map_out_036, bus, sys_cfg, ss_ctrl);
