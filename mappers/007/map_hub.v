@@ -15,10 +15,10 @@ module map_hub
 	
 	
 	assign map_out = 
-	map_idx == 30  ? map_out_098 : //map_out_030 :
+	map_idx == 30  ? map_out_030 :
 	map_idx == 36  ? map_out_036 :
 	map_idx == 46  ? map_out_046 :
-	map_idx == 98  ? map_out_098 :
+	// map_idx == 98  ? map_out_098 : // TODO: Use ines mapper 98 once mapper specs are finalized
 	map_idx == 104 ? map_out_104 :
 	map_idx == 111 ? map_out_111 :
 	map_idx == 162 ? map_out_162 :
@@ -34,6 +34,7 @@ module map_hub
 	map_idx == 230 ? map_out_230 :
 	map_idx == 233 ? map_out_233 :
 	map_idx == 235 ? map_out_235 :
+	map_idx == 248 ? map_out_098 :
 	map_out_nom;
 	
 	
