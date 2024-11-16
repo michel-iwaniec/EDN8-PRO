@@ -39,15 +39,16 @@ module map_098
 	assign prg_addr[13:0] = cpu_addr[13:0];
 	assign prg_addr[18:14] = cpu_addr[14] == 0 ? prg[7:0] : 8'b11111111;	
 	
-   wire fourscreen_disable = 1; //chr_reg[3];
-   wire swap_spr_nt = chr_reg[4];
-   wire wram_enable = 1; //chr_reg[5];
-   wire irq_enable = chr_reg[7];
+	wire fourscreen_disable = 1; //chr_reg[3];
+	wire swap_spr_nt = chr_reg[4];
+	wire wram_enable = 1; //chr_reg[5];
+	wire irq_enable = chr_reg[7];
+	wire irq_ack = !m2 & !cpu_rw & reg_area_chr;
 
-   wire spr_or_nt_fetch = ppu_addr[12] | ppu_addr[13];
+	wire spr_or_nt_fetch = ppu_addr[12] | ppu_addr[13];
 	wire vram_a12 = spr_or_nt_fetch ? 1'b0 : chr[0]; // TODO: Verify
-   wire vram_a13 = spr_or_nt_fetch ? swap_spr_nt : chr[1];
-   wire vram_a14 = spr_or_nt_fetch ? !chr[2] : chr[2];
+	wire vram_a13 = spr_or_nt_fetch ? swap_spr_nt : chr[1];
+	wire vram_a14 = spr_or_nt_fetch ? !chr[2] : chr[2];
 
 	assign chr_addr[11:0] = attribute_access ? {6'b111111, ppu_addr[5:0]} : ppu_addr[11:0];
 	assign chr_addr[14:12] = attribute_access ? {!chr[2], nt_lsb_y_d, nt_lsb_x_d} : {vram_a14, vram_a13, vram_a12};
@@ -76,17 +77,17 @@ module map_098
 	reg at_read;
 
 	// IRQ state: Activated when PPU A12 goes high. Deactivated when the 1st attribute access occurs.
-   // Emulate SR-latch via SR-flipflop
-   reg irq_latch_q;
-   always @(negedge ppu_oe)
-   begin
-		case({ppu_addr[12], next_fetch_is_at})
+	// Emulate SR-latch via SR-flipflop
+	reg irq_latch_q;
+	always @(negedge ppu_oe or posedge irq_ack)
+	begin
+		case({ppu_addr[12], irq_ack}) //next_fetch_is_at})
 			2'b00:   irq_latch_q <= irq_latch_q;
 			2'b01:   irq_latch_q <= 1'b0;
 			2'b10:   irq_latch_q <= 1'b1;
 			default: irq_latch_q <= irq_latch_q;
 		endcase	
-   end
+	end
 
 	reg [1:0]fla_state;
 	
@@ -105,7 +106,7 @@ module map_098
 	if(!cpu_rw)
 	begin
 		if(reg_area_prg) prg_bank_reg[7:0] <= cpu_dat[7:0];
-		if(reg_area_chr) chr_reg[7:0] <= cpu_dat[7:0];		
+		if(reg_area_chr) chr_reg[7:0] <= cpu_dat[7:0];
 	end
 	
 	// TODO: Investigate why using a13_d in place of ppu_addr[13] causes issues with at_after_dummy_fetch
